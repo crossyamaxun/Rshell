@@ -2,9 +2,11 @@
 
 mod app;
 mod connect;
+mod storage;
 
 pub use app::RshellApp;
 pub use connect::Connect;
+pub use storage::Storage;
 
 
 // 所有组件实现View

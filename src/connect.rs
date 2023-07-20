@@ -1,4 +1,3 @@
-use egui::Id;
 
 #[derive(PartialEq,Debug)]
 enum Method {
@@ -19,6 +18,8 @@ pub struct Connect {
     password:String,
     cert:String
 }
+
+pub struct ConnectList(Vec<Connect>);
 
 impl Default for Connect {
     fn default() -> Self {

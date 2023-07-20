@@ -7,6 +7,7 @@ rust-version = "1.65"
 
 
 [dependencies]
+term = "*"
 egui = "0.22.0"
 eframe = { version = "0.22.0", default-features = false, features = [
     "accesskit",     # Make egui comptaible with screen readers. NOTE: adds a lot of dependencies.
@@ -18,6 +19,7 @@ log = "0.4"
 
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }
+json = "0.12.4"
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

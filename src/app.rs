@@ -1,5 +1,7 @@
 use std::collections::BTreeSet;
-use crate::{Connect};
+use json::{JsonValue, object};
+
+use crate::{Connect, storage, Storage};
 
 use super::RShellUIComponent;
 
@@ -13,6 +15,9 @@ pub struct RshellApp {
 
     open: BTreeSet<String>,
     
+    connections:JsonValue,
+
+    temp:String
 
     
 }
@@ -29,10 +34,15 @@ impl Default for RshellApp {
 
 impl RshellApp {
 
-
     pub fn from(state:Vec<Box<dyn RShellUIComponent>>) -> Self {
         let open=BTreeSet::new();
-        Self { state, open }
+        let mut temp=String::from("   ");
+
+        //初始化配置数据
+        let storage=Storage::default();
+        let connections=storage.config["connections".to_string()].clone();
+
+        Self { state, open,temp, connections }
     }
 
     /// Called once before the first frame.
@@ -75,7 +85,7 @@ impl eframe::App for RshellApp {
     /// Called each time the UI needs repainting, which may be many times per second.
     /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        let Self { state,open} = self;
+        let Self { state,open,temp,connections} = self;
 
 
         for com in state {
@@ -111,31 +121,26 @@ impl eframe::App for RshellApp {
 
         egui::SidePanel::left("side_panel").show(ctx, |ui| {
             ui.heading("连接");
-
             ui.link("腾讯服务器-1");
 
-            
-
-            // ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
-            //     ui.horizontal(|ui| {
-            //         ui.spacing_mut().item_spacing.x = 0.0;
-            //         ui.label("powered by ");
-            //         ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-            //         ui.label(" and ");
-            //         ui.hyperlink_to(
-            //             "eframe",
-            //             "https://github.com/emilk/egui/tree/master/crates/eframe",
-            //         );
-            //         ui.label(".");
-            //     });
-            // });
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            // The central panel the region left after adding TopPanel's and SidePanel's
+            let text_style = egui::TextStyle::Body;
+            let row_height = ui.text_style_height(&text_style);
+            // let row_height = ui.spacing().interact_size.y; // if you are adding buttons instead of labels.
+            let total_rows = 10;
+            egui::ScrollArea::vertical().show_rows(ui, row_height, total_rows, |ui, row_range| {
+                for row in row_range {
+                    let text = format!("Row {}/{}", row + 1, total_rows);
+                    ui.label(text);
+                }
 
-            ui.heading("Rshell 正在开发当中...");
-            egui::warn_if_debug_build(ui);
+                ui.horizontal(|ui: &mut egui::Ui|{
+                    ui.label("root $:");
+                    ui.text_edit_multiline( temp);
+                });
+            });
         });
         
         
